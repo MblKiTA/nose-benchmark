@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os,logging,resource
+import os, logging, resource
 from nose.plugins import Plugin
 from multiprocessing import Pool
 
@@ -7,7 +7,16 @@ log = logging.getLogger('nose.plugins.benchmark')
 
 timesResults = []
 
+def info(title):
+    log.debug("Hello")
+    log.debug('Test name:' + title)
+    log.debug('Parent process:' + str(os.getppid()))
+    log.debug('Process id:' + str(os.getpid()))
+
 def invoker(object,fname):
+    info(fname)
+    # TODO:
+    # Counting only CPU time now
     tstart = resource.getrusage(resource.RUSAGE_SELF)[0]
     getattr(object,fname)._wrapped(object)
     tend = resource.getrusage(resource.RUSAGE_SELF)[0]
@@ -51,6 +60,6 @@ class Benchmark(Plugin):
     def afterTest(self, test):
         # TODO:
         # Do smth with the results
-        for i in range(len(timesResults)):
-            print '%2.60f ' % timesResults[i]
+        #for i in range(len(timesResults)):
+        #    print '%2.60f ' % timesResults[i]
         pass

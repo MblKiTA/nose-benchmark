@@ -3,7 +3,7 @@ from benchmark import benchmark
 import random
 
 class Test(object):
-    @benchmark(invocations=10)
+    @benchmark(invocations=10, threads=3)
     def testGenerateRandomNumber(self):
         for i in range(1000000):
             random.random()
