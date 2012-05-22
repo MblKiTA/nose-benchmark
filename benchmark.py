@@ -5,7 +5,7 @@ from multiprocessing import Pool
 
 log = logging.getLogger('nose.plugins.benchmark')
 
-timesResults = []
+results = []
 
 def info(title):
     log.debug("Hello")
@@ -29,13 +29,21 @@ def benchmark(invocations=1, threads=1):
     times using number of threads specified in 'threads'.
     """
     def decorator(fn):
-        global timesResults
+        global results
+        timesResults = []
+        oneTestResults = {}
+
         def wrapper(self, *args, **kwargs):
             pool = Pool(threads)
             for i in xrange(invocations):
                 res = pool.apply_async(invoker, args=(self,fn.__name__))
                 # Get the results returned by invoker function
                 timesResults.append(res.get())
+
+            oneTestResults['name'] = fn.__name__
+            oneTestResults['results'] = timesResults
+
+            results.append(oneTestResults)
 
             pool.close()
             pool.join()
@@ -60,6 +68,4 @@ class Benchmark(Plugin):
     def afterTest(self, test):
         # TODO:
         # Do smth with the results
-        # for i in range(len(timesResults)):
-        #     print '%2.60f ' % timesResults[i]
         pass
