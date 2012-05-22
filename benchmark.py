@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os,logging,resource
 from nose.plugins import Plugin
 from multiprocessing import Pool
