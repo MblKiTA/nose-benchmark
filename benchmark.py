@@ -60,6 +60,6 @@ class Benchmark(Plugin):
     def afterTest(self, test):
         # TODO:
         # Do smth with the results
-        #for i in range(len(timesResults)):
-        #    print '%2.60f ' % timesResults[i]
+        # for i in range(len(timesResults)):
+        #     print '%2.60f ' % timesResults[i]
         pass
