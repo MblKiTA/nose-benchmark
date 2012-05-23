@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import os, logging, resource
+import os, logging, resource, json
 from nose.plugins import Plugin
 from multiprocessing import Pool
+from scipy.stats import scoreatpercentile
 
 log = logging.getLogger('nose.plugins.benchmark')
 
-results = []
+measurements = []
 
 def info(title):
     log.debug("Hello")
@@ -29,21 +30,21 @@ def benchmark(invocations=1, threads=1):
     times using number of threads specified in 'threads'.
     """
     def decorator(fn):
-        global results
-        timesResults = []
-        oneTestResults = {}
+        global measurements
+        timesMeasurements = []
+        oneTestMeasurements = {}
 
         def wrapper(self, *args, **kwargs):
             pool = Pool(threads)
-            for i in xrange(invocations):
+            for i in range(invocations):
                 res = pool.apply_async(invoker, args=(self,fn.__name__))
-                # Get the results returned by invoker function
-                timesResults.append(res.get())
+                # Get the measurements returned by invoker function
+                timesMeasurements.append(res.get())
 
-            oneTestResults['name'] = fn.__name__
-            oneTestResults['results'] = timesResults
+            oneTestMeasurements['title'] = fn.__name__
+            oneTestMeasurements['results'] = timesMeasurements
 
-            results.append(oneTestResults)
+            measurements.append(oneTestMeasurements)
 
             pool.close()
             pool.join()
@@ -65,7 +66,23 @@ class Benchmark(Plugin):
         if not self.enabled:
             return
 
-    def afterTest(self, test):
-        # TODO:
-        # Do smth with the results
-        pass
+    def finalize(self, test):
+        """
+        Count and export performance results to JSON file
+        """
+        performanceResults = []
+
+        for i in range(len(measurements)):
+            performanceResult = {}
+            performanceResult['title'] = measurements[i]['title']
+            performanceResult['executionTime'] = sum(measurements[i]['results'])
+            performanceResult['invocations'] = len(measurements[i]['results'])
+            performanceResult['min'] = min(measurements[i]['results'])
+            performanceResult['max'] = max(measurements[i]['results'])
+            performanceResult['average'] = sum(measurements[i]['results']) / len(measurements[i]['results'])
+
+            performanceResult['median'] = scoreatpercentile(measurements[i]['results'], 50)
+            performanceResult['90percentile'] = scoreatpercentile(measurements[i]['results'], 90)
+
+            performanceResults.append(performanceResult)
+
