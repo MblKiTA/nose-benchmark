@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, logging, resource, json
+import os, logging, resource, json, StringIO
 from nose.plugins import Plugin
 from multiprocessing import Pool
 from scipy.stats import scoreatpercentile
@@ -80,9 +80,15 @@ class Benchmark(Plugin):
             performanceResult['min'] = min(measurements[i]['results'])
             performanceResult['max'] = max(measurements[i]['results'])
             performanceResult['average'] = sum(measurements[i]['results']) / len(measurements[i]['results'])
-
             performanceResult['median'] = scoreatpercentile(measurements[i]['results'], 50)
             performanceResult['90percentile'] = scoreatpercentile(measurements[i]['results'], 90)
 
             performanceResults.append(performanceResult)
+
+        self.save('summary.json', json.dumps(performanceResults, indent=4))
+
+    def save(self, filename, contents):
+        fh = open(filename, 'w')
+        fh.write(contents)
+        fh.close()
 

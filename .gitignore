@@ -1,5 +1,6 @@
 Benchmark_plugin.egg-info
 build
 dist
+summary.json
 *.pyc
 
