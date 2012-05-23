@@ -89,7 +89,14 @@ class Benchmark(Plugin):
 
         log.debug(resultsToSave)
 
+        # TODO:
+        # Get path from params
+        dir = 'reports/'
+
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+
         # Save the results
-        with open('summary.json', 'w') as f:
+        with open(dir + 'summary.json', 'w') as f:
             f.write(resultsToSave)
 
