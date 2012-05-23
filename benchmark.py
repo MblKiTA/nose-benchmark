@@ -85,10 +85,11 @@ class Benchmark(Plugin):
 
             performanceResults.append(performanceResult)
 
-        self.save('summary.json', json.dumps(performanceResults, indent=4))
+        resultsToSave = json.dumps(performanceResults, indent=4)
 
-    def save(self, filename, contents):
-        fh = open(filename, 'w')
-        fh.write(contents)
-        fh.close()
+        log.debug(resultsToSave)
+
+        # Save the results
+        with open('summary.json', 'w') as f:
+            f.write(resultsToSave)
 
