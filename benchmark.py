@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, logging, resource, json, StringIO
+import os, logging, resource, json
 from nose.plugins import Plugin
 from multiprocessing import Pool
 from scipy.stats import scoreatpercentile
