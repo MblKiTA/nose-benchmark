@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-import os, logging, resource, json
+import sys, os, logging, resource
+
+if sys.version_info < (2, 7):
+    import simplejson as json
+else:
+    import json
+
 from nose.plugins import Plugin
 from multiprocessing import Pool
 from scipy.stats import scoreatpercentile
@@ -55,14 +61,14 @@ def benchmark(invocations=1, threads=1):
         return wrapper
     return decorator
 
-class Benchmark(Plugin):
+class nose_benchmark(Plugin):
     name = 'benchmark'
 
     def options(self, parser, env=os.environ):
-        super(Benchmark, self).options(parser, env=env)
+        super(nose_benchmark, self).options(parser, env=env)
 
     def configure(self, options, conf):
-        super(Benchmark, self).configure(options, conf)
+        super(nose_benchmark, self).configure(options, conf)
         if not self.enabled:
             return
 
@@ -97,6 +103,10 @@ class Benchmark(Plugin):
             os.makedirs(dir)
 
         # Save the results
-        with open(dir + 'summary.json', 'w') as f:
+        if sys.version_info < (2, 7):
+            f = file(dir + 'summary.json', 'w')
             f.write(resultsToSave)
+        else:
+            with open(dir + 'summary.json', 'w') as f:
+                f.write(resultsToSave)
 
