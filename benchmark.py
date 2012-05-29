@@ -61,14 +61,14 @@ def benchmark(invocations=1, threads=1):
         return wrapper
     return decorator
 
-class nose_benchmark(Plugin):
+class Benchmark(Plugin):
     name = 'benchmark'
 
     def options(self, parser, env=os.environ):
-        super(nose_benchmark, self).options(parser, env=env)
+        super(Benchmark, self).options(parser, env=env)
 
     def configure(self, options, conf):
-        super(nose_benchmark, self).configure(options, conf)
+        super(Benchmark, self).configure(options, conf)
         if not self.enabled:
             return
 
