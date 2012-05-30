@@ -102,9 +102,5 @@ class Benchmark(Plugin):
             os.makedirs(dir)
 
         # Save the results
-        if sys.version_info < (2, 7):
-            f = file(dir + 'summary.json', 'w')
-            f.write(resultsToSave)
-        else:
-            with open(dir + 'summary.json', 'w') as f:
-                f.write(resultsToSave)
+        f = open(dir + 'summary.json', 'w')
+        f.write(resultsToSave)
