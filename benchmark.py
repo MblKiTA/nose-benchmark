@@ -15,7 +15,6 @@ log = logging.getLogger('nose.plugins.benchmark')
 measurements = []
 
 def info(title):
-    log.debug("Hello")
     log.debug('Test name:' + title)
     log.debug('Parent process:' + str(os.getppid()))
     log.debug('Process id:' + str(os.getpid()))
