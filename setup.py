@@ -24,5 +24,4 @@ setup(
             'benchmark = benchmark:Benchmark'
             ]
         }
-
     )
