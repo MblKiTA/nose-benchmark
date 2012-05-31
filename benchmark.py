@@ -71,7 +71,7 @@ class Benchmark(Plugin):
         if not self.enabled:
             return
 
-    def finalize(self, test):
+    def stopContext(self, object):
         """
         Count and export performance results to JSON file
         """
@@ -94,13 +94,15 @@ class Benchmark(Plugin):
 
         log.debug(resultsToSave)
 
-        # TODO:
-        # Get path from params
-        dir = 'python/reports/'
+        if hasattr(object, '__module__'):
 
-        if not os.path.exists(dir):
-            os.makedirs(dir)
+            # TODO:
+            # Get path from params
+            dir = 'python/reports/'
 
-        # Save the results
-        f = open(dir + 'summary.json', 'w')
-        f.write(resultsToSave)
+            if not os.path.exists(dir):
+                os.makedirs(dir)
+
+            # Save the results
+            f = open(dir + object.__module__ + '.json', 'w')
+            f.write(resultsToSave)
