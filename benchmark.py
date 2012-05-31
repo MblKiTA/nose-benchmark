@@ -90,6 +90,9 @@ class Benchmark(Plugin):
 
             performanceResults.append(performanceResult)
 
+        # Clear measurements for next module
+        del measurements[:]
+
         resultsToSave = json.dumps(performanceResults, indent=4)
 
         log.debug(resultsToSave)
