@@ -23,8 +23,5 @@ setup(
         'nose.plugins.0.10': [
             'benchmark = benchmark:Benchmark'
             ]
-        },
-    setup_requires = [
-         'scipy>=0.9.0'
-        ]
+        }
     )
