@@ -12,7 +12,7 @@ except ImportError:
 from setuptools import setup
 
 setup(
-    name='Benchmark plugin',
+    name='nose-benchmark-plugin',
     version='0.4',
     author='Nikita Basalaev',
     author_email = 'nikita@mail.by',
