@@ -12,8 +12,8 @@ except ImportError:
 from setuptools import setup
 
 setup(
-    name='nose-benchmark-plugin',
-    version='0.4',
+    name='nose-benchmark',
+    version='0.6',
     author='Nikita Basalaev',
     author_email = 'nikita@mail.by',
     description = 'Benchmark nose plugin',
