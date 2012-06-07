@@ -24,7 +24,4 @@ setup(
             'benchmark = benchmark:Benchmark'
             ]
         },
-    setup_requires = [
-         'func'
-        ]
     )

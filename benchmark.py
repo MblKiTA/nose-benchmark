@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, os, logging, resource, math, func
+import sys, os, logging, resource, math
 
 if sys.version_info < (2, 7):
     import simplejson as json
