@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, os, logging, resource, math
+import sys, os, logging, resource
 
 if sys.version_info < (2, 7):
     import simplejson as json
@@ -8,29 +8,7 @@ else:
 
 from nose.plugins import Plugin
 from multiprocessing import Pool
-#from scipy.stats import scoreatpercentile
-
-def scoreatpercentile(N, percent, key=lambda x:x):
-    """
-    Find the percentile of a list of values.
-
-    @parameter N - is a list of values. Note N MUST BE already sorted.
-    @parameter percent - a float value from 0.0 to 1.0.
-    @parameter key - optional key function to compute value from each element of N.
-
-    @return - the percentile of the values
-    """
-    if not N:
-        return None
-    k = (len(N)-1) * percent
-    f = math.floor(k)
-    c = math.ceil(k)
-    if f == c:
-        return key(N[int(k)])
-    d0 = key(N[int(f)]) * (c-k)
-    d1 = key(N[int(c)]) * (k-f)
-    return d0+d1
-
+from scipy.stats import scoreatpercentile
 
 log = logging.getLogger('nose.plugins.benchmark')
 
@@ -107,8 +85,8 @@ class Benchmark(Plugin):
             performanceResult['min'] = min(measurements[i]['results'])
             performanceResult['max'] = max(measurements[i]['results'])
             performanceResult['average'] = sum(measurements[i]['results']) / len(measurements[i]['results'])
-            performanceResult['median'] = scoreatpercentile(sorted(measurements[i]['results']), 50)
-            performanceResult['90percentile'] = scoreatpercentile(sorted(measurements[i]['results']), 90)
+            performanceResult['median'] = scoreatpercentile(measurements[i]['results'], 50)
+            performanceResult['90percentile'] = scoreatpercentile(measurements[i]['results'], 90)
 
             performanceResults.append(performanceResult)
 
