@@ -25,6 +25,6 @@ setup(
             ]
         },
     setup_requires = [
-         'scipy>=0.10.1'
+         'scipy>=0.9.0'
         ]
     )
