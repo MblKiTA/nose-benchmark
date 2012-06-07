@@ -85,8 +85,8 @@ class Benchmark(Plugin):
             performanceResult['min'] = min(measurements[i]['results'])
             performanceResult['max'] = max(measurements[i]['results'])
             performanceResult['average'] = sum(measurements[i]['results']) / len(measurements[i]['results'])
-            performanceResult['median'] = scoreatpercentile(measurements[i]['results'], 50)
-            performanceResult['90percentile'] = scoreatpercentile(measurements[i]['results'], 90)
+            performanceResult['median'] = scoreatpercentile(sorted(measurements[i]['results']), 50)
+            performanceResult['90percentile'] = scoreatpercentile(sorted(measurements[i]['results']), 90)
 
             performanceResults.append(performanceResult)
 
