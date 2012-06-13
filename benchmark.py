@@ -121,7 +121,7 @@ class Benchmark(Plugin):
 
             # TODO:
             # Get path from params
-            dir = '../reports/'
+            dir = 'reports/'
 
             if not os.path.exists(dir):
                 os.makedirs(dir)
