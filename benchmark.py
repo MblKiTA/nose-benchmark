@@ -56,6 +56,7 @@ def benchmark(invocations=1, threads=1):
     """
     def decorator(fn):
         global measurements
+        resArray = []
         timesMeasurements = []
         oneTestMeasurements = {}
 
@@ -63,16 +64,18 @@ def benchmark(invocations=1, threads=1):
             pool = Pool(threads)
             for i in range(invocations):
                 res = pool.apply_async(invoker, args=(self,fn.__name__))
-                # Get the measurements returned by invoker function
-                timesMeasurements.append(res.get())
-
-            oneTestMeasurements['title'] = fn.__name__
-            oneTestMeasurements['results'] = timesMeasurements
-
-            measurements.append(oneTestMeasurements)
+                # Gather res links
+                resArray.append(res)
 
             pool.close()
             pool.join()
+
+            for res in resArray:
+                # Get the measurements returned by invoker function
+                timesMeasurements.append(res.get())
+                oneTestMeasurements['title'] = fn.__name__
+                oneTestMeasurements['results'] = timesMeasurements
+                measurements.append(oneTestMeasurements)
 
         wrapper.__doc__ = fn.__doc__
         wrapper.__name__ = fn.__name__
