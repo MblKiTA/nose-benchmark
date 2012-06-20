@@ -86,8 +86,10 @@ def invoker(object,fname):
     tstart = time.clock()
     getattr(object,fname)._wrapped(object)
     tend = time.clock()
-
-    resArray.append(tend - tstart)
+    if not noMultiprocessingModule:
+        return tend - tstart
+    else:
+        resArray.append(tend - tstart)
 
 def benchmark(invocations=1, threads=1):
     """
@@ -105,19 +107,24 @@ def benchmark(invocations=1, threads=1):
             if not noMultiprocessingModule:
                 pool = Pool(threads)
                 for i in range(invocations):
-                    pool.apply_async(invoker, args=(self,fn.__name__))
+                    res = pool.apply_async(invoker, args=(self,fn.__name__))
 
                 pool.close()
                 pool.join()
+                
+                for res in resArray:
+                    # Get the measurements returned by invoker function
+                    timesMeasurements.append(res.get())
+
             else:
                 pool = ThreadPool(threads)
                 for i in range(invocations):
                     pool.add_task(invoker, self, fn.__name__)
                 pool.wait_completion()
 
-            for res in resArray:
-                # Get the measurements returned by invoker function
-                timesMeasurements.append(res)
+                for res in resArray:
+                    # Get the measurements returned by invoker function
+                    timesMeasurements.append(res)
 
             oneTestMeasurements['title'] = fn.__name__
             oneTestMeasurements['results'] = timesMeasurements
