@@ -44,6 +44,7 @@ except ImportError:
         def add_task(self, func, *args, **kargs):
             """Add a task to the queue"""
             self.tasks.put((func, args, kargs))
+            return self.tasks
 
         def join(self):
             """Wait for completion of all the tasks in the queue"""
