@@ -28,10 +28,7 @@ except ImportError:
         def run(self):
             while True:
                 func, args, kargs = self.tasks.get()
-                try:
-                    func(*args, **kargs)
-                except Exception:
-                    print Exception
+                func(*args, **kargs)
                 self.tasks.task_done()
 
     class ThreadPool:
