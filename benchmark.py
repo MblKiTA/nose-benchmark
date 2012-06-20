@@ -10,7 +10,7 @@ from nose.plugins import Plugin
 
 noMultiprocessingModule = False
 try:
-    from multiprocessing1 import Pool
+    from multiprocessing import Pool
 except ImportError:
     noMultiprocessingModule = True
 
