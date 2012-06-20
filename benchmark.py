@@ -8,10 +8,12 @@ else:
 
 from nose.plugins import Plugin
 
+noPool = False
 try:
     from multiprocessing import Pool
 except ImportError:
-    import java.util.concurrent.ThreadPoolExecutor as Pool
+    import threadpool
+    noPool = True
 
 
 def scoreatpercentile(N, percent, key=lambda x:x):
@@ -35,14 +37,17 @@ def scoreatpercentile(N, percent, key=lambda x:x):
     d1 = key(N[int(c)]) * (k-f)
     return d0+d1
 
+
 log = logging.getLogger('nose.plugins.benchmark')
 
 measurements = []
+resArray = []
 
 def info(title):
     log.debug('Test name:' + title)
     log.debug('Parent process:' + str(os.getppid()))
     log.debug('Process id:' + str(os.getpid()))
+
 
 def invoker(object,fname):
     info(fname)
@@ -52,7 +57,8 @@ def invoker(object,fname):
     getattr(object,fname)._wrapped(object)
     tend = time.clock()
 
-    return tend - tstart
+    resArray.append(tend - tstart)
+
 
 def benchmark(invocations=1, threads=1):
     """
@@ -60,33 +66,33 @@ def benchmark(invocations=1, threads=1):
     times using number of threads specified in 'threads'.
     """
     def decorator(fn):
-        global measurements
+        global measurements, resArray
         resArray = []
         timesMeasurements = []
         oneTestMeasurements = {}
 
         def wrapper(self, *args, **kwargs):
-            pool = Pool(threads)
-            for i in range(invocations):
-                # Let's try to create a pool of threads
-                try:
-                    res = pool.apply_async(invoker, args=(self,fn.__name__))
-                except AttributeError:
-                    res = pool.add_task(invoker, args=(self,fn.__name__))
+            if not noPool:
+                pool = Pool(threads)
+                for i in range(invocations):
+                    pool.apply_async(invoker, args=(self,fn.__name__))
 
-                # Gather res links
-                resArray.append(res)
-
-            try:
                 pool.close()
-            except AttributeError:
-                pass
+                pool.join()
+            else:
+                pool = threadpool.ThreadPool(threads)
 
-            pool.join()
+                for i in range(invocations):
+                    requests = threadpool.makeRequests(invoker, args=(self,fn.__name__))
+
+                for req in requests:
+                    pool.putRequest(req)
+
+                pool.wait()
 
             for res in resArray:
                 # Get the measurements returned by invoker function
-                timesMeasurements.append(res.get())
+                timesMeasurements.append(res)
                 oneTestMeasurements['title'] = fn.__name__
                 oneTestMeasurements['results'] = timesMeasurements
                 measurements.append(oneTestMeasurements)
@@ -96,6 +102,7 @@ def benchmark(invocations=1, threads=1):
         wrapper._wrapped = fn
         return wrapper
     return decorator
+
 
 class Benchmark(Plugin):
     name = 'benchmark'

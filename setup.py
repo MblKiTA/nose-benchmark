@@ -11,6 +11,11 @@ except ImportError:
 
 from setuptools import setup
 
+if sys.platform.startswith('java'):
+    requiredPacks = ['threadpool']
+else:
+    requiredPacks = []
+
 setup(
     name='nose-benchmark',
     version='0.9',
@@ -24,4 +29,5 @@ setup(
             'benchmark = benchmark:Benchmark'
             ]
         },
+    setup_requires = requiredPacks
     )
