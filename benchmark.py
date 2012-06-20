@@ -22,6 +22,9 @@ except ImportError:
             self.daemon = True
             self.start()
 
+        def get(self):
+            return self.result
+
         def run(self):
             while True:
                 func, args, kargs = self.tasks.get()
