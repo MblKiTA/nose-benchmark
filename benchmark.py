@@ -42,7 +42,7 @@ except ImportError:
             """Add a task to the queue"""
             self.tasks.put((func, args, kargs))
 
-        def wait_completion(self):
+        def join(self):
             """Wait for completion of all the tasks in the queue"""
             self.tasks.join()
 
@@ -110,7 +110,11 @@ def benchmark(invocations=1, threads=1):
                 # Gather res links
                 resArray.append(res)
 
-            pool.close()
+            try:
+                pool.close()
+            except AttributeError:
+                pass
+
             pool.join()
 
             for res in resArray:
