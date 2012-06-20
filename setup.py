@@ -11,6 +11,8 @@ except ImportError:
 
 from setuptools import setup
 
+import sys
+
 if sys.platform.startswith('java'):
     requiredPacks = ['threadpool']
 else:
