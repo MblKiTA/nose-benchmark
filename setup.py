@@ -11,13 +11,6 @@ except ImportError:
 
 from setuptools import setup
 
-import sys
-
-if sys.platform.startswith('java'):
-    requiredPacks = ['threadpool']
-else:
-    requiredPacks = []
-
 setup(
     name='nose-benchmark',
     version='0.9',
@@ -30,6 +23,5 @@ setup(
         'nose.plugins.0.10': [
             'benchmark = benchmark:Benchmark'
             ]
-        },
-    setup_requires = requiredPacks
+        }
     )
