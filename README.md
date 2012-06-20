@@ -10,4 +10,10 @@ then run example:
 
      nosetests -v -s --with-benchmark example.py
 
+For nosetests.conf use:
+
+    [nosetests]
+    with-benchmark=1
+
+
 
