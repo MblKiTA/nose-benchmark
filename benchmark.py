@@ -101,7 +101,12 @@ def benchmark(invocations=1, threads=1):
         def wrapper(self, *args, **kwargs):
             pool = Pool(threads)
             for i in range(invocations):
-                res = pool.apply_async(invoker, args=(self,fn.__name__))
+                # Let's try to create a pool of threads
+                try:
+                    res = pool.apply_async(invoker, args=(self,fn.__name__))
+                except AttributeError:
+                    res = pool.add_task(invoker, args=(self,fn.__name__))
+
                 # Gather res links
                 resArray.append(res)
 
