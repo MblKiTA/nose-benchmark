@@ -108,6 +108,8 @@ def benchmark(invocations=1, threads=1):
                 pool = Pool(threads)
                 for i in range(invocations):
                     res = pool.apply_async(invoker, args=(self,fn.__name__))
+                    # Gather res links
+                    resArray.append(res)    
 
                 pool.close()
                 pool.join()
@@ -125,7 +127,7 @@ def benchmark(invocations=1, threads=1):
                 for res in resArray:
                     # Get the measurements returned by invoker function
                     timesMeasurements.append(res)
-
+                    
             oneTestMeasurements['title'] = fn.__name__
             oneTestMeasurements['results'] = timesMeasurements
             measurements.append(oneTestMeasurements)
