@@ -30,8 +30,8 @@ except ImportError:
                 func, args, kargs = self.tasks.get()
                 try:
                     func(*args, **kargs)
-                except Exception, e:
-                    print e
+                except Exception:
+                    print Exception
                 self.tasks.task_done()
 
     class ThreadPool:
