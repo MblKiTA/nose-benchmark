@@ -28,7 +28,10 @@ except ImportError:
         def run(self):
             while True:
                 func, args, kargs = self.tasks.get()
-                func(*args, **kargs)
+                try:
+                    func(*args, **kargs)
+                except:
+                    pass
                 self.tasks.task_done()
 
     class ThreadPool:
@@ -109,11 +112,11 @@ def benchmark(invocations=1, threads=1):
                 for i in range(invocations):
                     res = pool.apply_async(invoker, args=(self,fn.__name__))
                     # Gather res links
-                    resArray.append(res)    
+                    resArray.append(res)
 
                 pool.close()
                 pool.join()
-                
+
                 for res in resArray:
                     # Get the measurements returned by invoker function
                     timesMeasurements.append(res.get())
@@ -127,7 +130,7 @@ def benchmark(invocations=1, threads=1):
                 for res in resArray:
                     # Get the measurements returned by invoker function
                     timesMeasurements.append(res)
-                    
+
             oneTestMeasurements['title'] = fn.__name__
             oneTestMeasurements['results'] = timesMeasurements
             measurements.append(oneTestMeasurements)
