@@ -26,12 +26,13 @@ except ImportError:
             self.start()
 
         def run(self):
-            func, args, kargs = self.tasks.get()
-            try:
-                func(*args, **kargs)
-            except:
-                pass
-            self.tasks.task_done()
+            while True:
+                func, args, kargs = self.tasks.get()
+                try:
+                    func(*args, **kargs)
+                except:
+                    pass
+                self.tasks.task_done()
 
     class ThreadPool:
         """Pool of threads consuming tasks from a queue"""
