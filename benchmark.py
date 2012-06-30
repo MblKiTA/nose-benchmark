@@ -94,7 +94,7 @@ def invoker(object,fname):
     else:
         resArray.append(tend - tstart)
 
-def benchmark(invocations=1, threads=1):
+def benchmark(invocations=1, repeats=1, threads=1):
     """
     Decorator, that marks test to be executed 'invocations'
     times using number of threads specified in 'threads'.
@@ -133,6 +133,9 @@ def benchmark(invocations=1, threads=1):
 
             oneTestMeasurements['title'] = fn.__name__
             oneTestMeasurements['results'] = timesMeasurements
+            oneTestMeasurements['invocations'] = invocations
+            oneTestMeasurements['repeats'] = repeats
+
             measurements.append(oneTestMeasurements)
 
         wrapper.__doc__ = fn.__doc__
@@ -162,6 +165,8 @@ class Benchmark(Plugin):
         for i in range(len(measurements)):
             performanceResult = {}
             performanceResult['title'] = measurements[i]['title']
+            performanceResult['invocations'] = measurements[i]['invocations']
+            performanceResult['repeats'] = measurements[i]['repeats']
             performanceResult['executionTime'] = sum(measurements[i]['results'])
             performanceResult['invocations'] = len(measurements[i]['results'])
             performanceResult['min'] = min(measurements[i]['results'])
