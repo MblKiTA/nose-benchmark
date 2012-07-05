@@ -47,8 +47,6 @@ for className in testsConfigRaw['classes']:
         else:
             testsConfig['classes'][newClassName][methodName] = testsConfigRaw['classes'][className][methodName]
 
-import pdb; pdb.set_trace()
-
 def scoreatpercentile(N, percent, key=lambda x:x):
     """
     Find the percentile of a list of values.
