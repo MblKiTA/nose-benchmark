@@ -18,8 +18,8 @@ def upper(matchobj):
 # - Get filenames from options
 # - Check if they exist
 # - Check if they are not empty
-f1 = open('../config.json', 'r')
-f2 = open('./config.json', 'r')
+f1 = open('./config.json', 'r')
+f2 = open('python/config.json', 'r')
 
 testsConfigRaw1 = json.load(f1)
 testsConfigRaw2 = json.load(f2)
@@ -136,8 +136,6 @@ def benchmark(invocations=0, repeats=0, threads=0):
                     # If nothing found before:
                     if paramsTest[paramName] == 0:
                         paramsTest[paramName] = 1
-
-            import pdb; pdb.set_trace()
 
             pool = Pool(paramsTest['threads'])
             for i in range(paramsTest['invocations']):
