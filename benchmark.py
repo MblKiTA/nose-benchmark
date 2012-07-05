@@ -18,16 +18,15 @@ def upper(matchobj):
 # - Get filenames from options
 # - Check if they exist
 # - Check if they are not empty
-f1 = open('../config.json', 'r')
-f2 = open('./config.json', 'r')
+f1 = open('./config.json', 'r')
+f2 = open('python/config.json', 'r')
 
 testsConfigRaw1 = json.load(f1)
 testsConfigRaw2 = json.load(f2)
 
 # Unite our config dictionaries into one
-dictUnion = lambda d1,d2: dict((x,(dictUnion(d1.get(x,{}),d2[x]) if
-  isinstance(d2.get(x),dict) else d2.get(x,d1.get(x)))) for x in
-  set(d1.keys()+d2.keys()))
+def dictUnion (d1,d2):
+    return dict((x,(dictUnion(d1.get(x,{}),d2[x]) if isinstance(d2.get(x),dict) else d2.get(x,d1.get(x)))) for x in set(d1.keys()+d2.keys()))
 
 
 testsConfigRaw = dictUnion(testsConfigRaw1, testsConfigRaw2)
