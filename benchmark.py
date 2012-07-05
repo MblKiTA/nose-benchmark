@@ -25,9 +25,11 @@ testsConfigRaw1 = json.load(f1)
 testsConfigRaw2 = json.load(f2)
 
 # Unite our config dictionaries into one
-dictUnion = lambda d1,d2: dict((x,(dictUnion(d1.get(x,{}),d2[x]) if
-  isinstance(d2.get(x),dict) else d2.get(x,d1.get(x)))) for x in
-  set(d1.keys()+d2.keys()))
+def dictUnion(A, B):
+    if not isinstance(A, dict) or not isinstance(B, dict):
+        return A or B
+    return dict([(a, join(A.get(a), B.get(a))) for a in set(A.keys()) | set(B.keys())])
+
 
 testsConfigRaw = dictUnion(testsConfigRaw1, testsConfigRaw2)
 
