@@ -8,46 +8,46 @@ else:
 
 from nose.plugins import Plugin
 
-noMultiprocessingModule = False
-try:
-    from multiprocessing import Pool
-except ImportError:
-    noMultiprocessingModule = True
+from multiprocessing import Pool
 
-    from Queue import Queue
-    from threading import Thread
+import re
+def upper(matchobj):
+    return matchobj.group(0).upper()
 
-    class Worker(Thread):
-        """Thread executing tasks from a given tasks queue"""
-        def __init__(self, tasks):
-            Thread.__init__(self)
-            self.tasks = tasks
-            self.daemon = True
-            self.start()
+# TODO:
+# - Get filenames from options
+# - Check if they exist
+# - Check if they are not empty
+f1 = open('../config.json', 'r')
+f2 = open('./config.json', 'r')
 
-        def run(self):
-            while True:
-                func, args, kargs = self.tasks.get()
-                try:
-                    func(*args, **kargs)
-                except:
-                    pass
-                self.tasks.task_done()
+testsConfigRaw1 = json.load(f1)
+testsConfigRaw2 = json.load(f2)
 
-    class ThreadPool:
-        """Pool of threads consuming tasks from a queue"""
-        def __init__(self, num_threads):
-            self.tasks = Queue(num_threads)
-            for _ in range(num_threads): Worker(self.tasks)
+# Unite our config dictionaries into one
+dictUnion = lambda d1,d2: dict((x,(dictUnion(d1.get(x,{}),d2[x]) if
+  isinstance(d2.get(x),dict) else d2.get(x,d1.get(x)))) for x in
+  set(d1.keys()+d2.keys()))
 
-        def add_task(self, func, *args, **kargs):
-            """Add a task to the queue"""
-            self.tasks.put((func, args, kargs))
+testsConfigRaw = dictUnion(testsConfigRaw1, testsConfigRaw2)
 
-        def wait_completion(self):
-            """Wait for completion of all the tasks in the queue"""
-            self.tasks.join()
+testsConfig = {}
+testsConfig['classes'] = {}
+testsConfig['default'] = testsConfigRaw['default']
 
+# Adapt config to Python tests
+for className in testsConfigRaw['classes']:
+    newClassName = 'Test' + className
+    testsConfig['classes'][newClassName] = testsConfigRaw['classes'][className]
+    testsConfig['classes'][newClassName] = {}
+    for methodName in testsConfigRaw['classes'][className]:
+        # Adapt method names from config
+        if methodName != 'default':
+            testsConfig['classes'][newClassName]['test' + re.sub(r'\b\w', upper, methodName)] = testsConfigRaw['classes'][className][methodName]
+        else:
+            testsConfig['classes'][newClassName][methodName] = testsConfigRaw['classes'][className][methodName]
+
+import pdb; pdb.set_trace()
 
 def scoreatpercentile(N, percent, key=lambda x:x):
     """
@@ -82,19 +82,20 @@ def info(title):
     log.debug('Process id:' + str(os.getpid()))
 
 
-def invoker(object,fname):
+def invoker(object, fname, repeats):
     info(fname)
     # TODO:
     # Counting only CPU time now
     tstart = time.clock()
-    getattr(object,fname)._wrapped(object)
-    tend = time.clock()
-    if not noMultiprocessingModule:
-        return tend - tstart
-    else:
-        resArray.append(tend - tstart)
 
-def benchmark(invocations=1, repeats=1, threads=1):
+    for i in range(repeats):
+        getattr(object,fname)._wrapped(object)
+
+    tend = time.clock()
+
+    return tend - tstart
+
+def benchmark(invocations=0, repeats=0, threads=0):
     """
     Decorator, that marks test to be executed 'invocations'
     times using number of threads specified in 'threads'.
@@ -106,35 +107,55 @@ def benchmark(invocations=1, repeats=1, threads=1):
         oneTestMeasurements = {}
 
         def wrapper(self, *args, **kwargs):
+            className = self.__class__.__name__
+            functionName = fn.__name__
 
-            if not noMultiprocessingModule:
-                pool = Pool(threads)
-                for i in range(invocations):
-                    res = pool.apply_async(invoker, args=(self,fn.__name__))
-                    # Gather res links
-                    resArray.append(res)
+            paramsTest = {}
+            paramsTest['invocations'] = invocations
+            paramsTest['repeats'] = repeats
+            paramsTest['threads'] = threads
 
-                pool.close()
-                pool.join()
+            # Let's look up for config values
+            # If there is no config value we'll use one from params
 
-                for res in resArray:
-                    # Get the measurements returned by invoker function
-                    timesMeasurements.append(res.get())
+            for paramName in paramsTest:
 
-            else:
-                pool = ThreadPool(threads)
-                for i in range(invocations):
-                    pool.add_task(invoker, self, fn.__name__)
-                pool.wait_completion()
+                if paramsTest[paramName] == 0:
+                    # Search in 'default' section
+                    if paramName in testsConfig['default'] and testsConfig['default'][paramName]>0:
+                        paramsTest[paramName] = testsConfig['default'][paramName]
 
-                for res in resArray:
-                    # Get the measurements returned by invoker function
-                    timesMeasurements.append(res)
+                    # Search in 'default' section of class
+                    if className in testsConfig['classes'] and 'default' in testsConfig['classes'][className] and paramName in testsConfig['classes'][className]['default']:
+                        paramsTest[paramName] = testsConfig['classes'][className]['default'][paramName]
+
+                    # Search in class section
+                    if className in testsConfig['classes'] and functionName in testsConfig['classes'][className] and paramName in testsConfig['classes'][className][functionName] and testsConfig['classes'][className][functionName][paramName]>0:
+                        paramsTest[paramName] = testsConfig['classes'][className][functionName][paramName]
+
+                    # If nothing found before:
+                    if paramsTest[paramName] == 0:
+                        paramsTest[paramName] = 1
+
+            import pdb; pdb.set_trace()
+
+            pool = Pool(paramsTest['threads'])
+            for i in range(paramsTest['invocations']):
+                res = pool.apply_async(invoker, args=(self, fn.__name__, paramsTest['repeats']))
+                # Gather res links
+                resArray.append(res)
+
+            pool.close()
+            pool.join()
+
+            for res in resArray:
+                # Get the measurements returned by invoker function
+                timesMeasurements.append(res.get())
 
             oneTestMeasurements['title'] = fn.__name__
             oneTestMeasurements['results'] = timesMeasurements
-            oneTestMeasurements['invocations'] = invocations
-            oneTestMeasurements['repeats'] = repeats
+            oneTestMeasurements['invocations'] = paramsTest['invocations']
+            oneTestMeasurements['repeats'] = paramsTest['repeats']
 
             measurements.append(oneTestMeasurements)
 
@@ -174,6 +195,9 @@ class Benchmark(Plugin):
             performanceResult['average'] = sum(measurements[i]['results']) / len(measurements[i]['results'])
             performanceResult['median'] = scoreatpercentile(sorted(measurements[i]['results']), 0.5)
             performanceResult['90percentile'] = scoreatpercentile(sorted(measurements[i]['results']), 0.9)
+
+            if performanceResult['average']>0:
+                performanceResult['operationspersecond'] = measurements[i]['repeats']/performanceResult['average']
 
             performanceResults.append(performanceResult)
 
