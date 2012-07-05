@@ -18,8 +18,8 @@ def upper(matchobj):
 # - Get filenames from options
 # - Check if they exist
 # - Check if they are not empty
-f1 = open('./config.json', 'r')
-f2 = open('python/config.json', 'r')
+f1 = open('../config.json', 'r')
+f2 = open('./config.json', 'r')
 
 testsConfigRaw1 = json.load(f1)
 testsConfigRaw2 = json.load(f2)
