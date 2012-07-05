@@ -25,10 +25,9 @@ testsConfigRaw1 = json.load(f1)
 testsConfigRaw2 = json.load(f2)
 
 # Unite our config dictionaries into one
-def dictUnion(A, B):
-    if not isinstance(A, dict) or not isinstance(B, dict):
-        return A or B
-    return dict([(a, join(A.get(a), B.get(a))) for a in set(A.keys()) | set(B.keys())])
+dictUnion = lambda d1,d2: dict((x,(dictUnion(d1.get(x,{}),d2[x]) if
+  isinstance(d2.get(x),dict) else d2.get(x,d1.get(x)))) for x in
+  set(d1.keys()+d2.keys()))
 
 
 testsConfigRaw = dictUnion(testsConfigRaw1, testsConfigRaw2)
@@ -48,6 +47,8 @@ for className in testsConfigRaw['classes']:
             testsConfig['classes'][newClassName]['test' + re.sub(r'\b\w', upper, methodName)] = testsConfigRaw['classes'][className][methodName]
         else:
             testsConfig['classes'][newClassName][methodName] = testsConfigRaw['classes'][className][methodName]
+
+import pdb;pdb.set_trace()
 
 def scoreatpercentile(N, percent, key=lambda x:x):
     """
