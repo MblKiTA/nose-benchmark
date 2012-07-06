@@ -111,7 +111,7 @@ def benchmark(invocations=0, repeats=0, threads=0):
 
         def wrapper(self, *args, **kwargs):
             className = self.__class__.__name__
-            functionName = fn.__name__
+            methodName = fn.__name__
 
             paramsTest = {}
             paramsTest['invocations'] = invocations
@@ -120,7 +120,6 @@ def benchmark(invocations=0, repeats=0, threads=0):
 
             # Let's look up for config values
             # If there is no config value we'll use one from params
-
             for paramName in paramsTest:
 
                 if paramsTest[paramName] == 0:
@@ -133,8 +132,8 @@ def benchmark(invocations=0, repeats=0, threads=0):
                         paramsTest[paramName] = testsConfig['classes'][className]['default'][paramName]
 
                     # Search in class section
-                    if className in testsConfig['classes'] and functionName in testsConfig['classes'][className] and paramName in testsConfig['classes'][className][functionName] and testsConfig['classes'][className][functionName][paramName]>0:
-                        paramsTest[paramName] = testsConfig['classes'][className][functionName][paramName]
+                    if className in testsConfig['classes'] and methodName in testsConfig['classes'][className] and paramName in testsConfig['classes'][className][methodName] and testsConfig['classes'][className][methodName][paramName]>0:
+                        paramsTest[paramName] = testsConfig['classes'][className][methodName][paramName]
 
                     # If nothing found before:
                     if paramsTest[paramName] == 0:
