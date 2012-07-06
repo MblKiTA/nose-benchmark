@@ -198,7 +198,7 @@ class Benchmark(Plugin):
             performanceResult['90percentile'] = scoreatpercentile(sorted(measurements[i]['results']), 0.9)
 
             if performanceResult['average']>0:
-                performanceResult['operationspersecond'] = measurements[i]['repeats']/performanceResult['average']
+                performanceResult['operationsPerSecond'] = measurements[i]['repeats']/performanceResult['average']
 
             performanceResults.append(performanceResult)
 
