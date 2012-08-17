@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-import sys, os, logging, math, time
+import sys, os, logging, math, time, requests
 
 if sys.version_info < (2, 7):
     import simplejson as json
@@ -11,8 +10,14 @@ from nose.plugins import Plugin
 from multiprocessing import Pool
 
 import re
+
 def upper(matchobj):
     return matchobj.group(0).upper()
+
+# TODO:
+# - Get post url from options
+postUrl = 'http://still-wildwood-9084.herokuapp.com/send/c6ebcf9ec36d21fbc8aea7d6d26a7411'
+
 
 # TODO:
 # - Get filenames from options
@@ -152,7 +157,8 @@ def benchmark(invocations=0, repeats=0, threads=0):
                 # Get the measurements returned by invoker function
                 timesMeasurements.append(res.get())
 
-            oneTestMeasurements['title'] = fn.__name__
+            oneTestMeasurements['title'] = methodName
+            oneTestMeasurements['class'] = className
             oneTestMeasurements['results'] = timesMeasurements
             oneTestMeasurements['invocations'] = paramsTest['invocations']
             oneTestMeasurements['repeats'] = paramsTest['repeats']
@@ -186,6 +192,7 @@ class Benchmark(Plugin):
         for i in range(len(measurements)):
             performanceResult = {}
             performanceResult['title'] = measurements[i]['title']
+            performanceResult['class'] = measurements[i]['class']
             performanceResult['invocations'] = measurements[i]['invocations']
             performanceResult['repeats'] = measurements[i]['repeats']
             performanceResult['executionTime'] = sum(measurements[i]['results'])
@@ -204,11 +211,27 @@ class Benchmark(Plugin):
         # Clear measurements for next module
         del measurements[:]
 
-        resultsToSave = json.dumps(performanceResults, indent=4)
-
-        log.debug(resultsToSave)
-
         if hasattr(object, '__module__'):
+            resultsToSave = json.dumps(performanceResults, indent=4)
+            log.debug(resultsToSave)
+
+            # Form results to post
+            performanceResultsPost = []
+
+            # Adapt names
+            testRemoveReg = re.compile(re.escape('test'), re.IGNORECASE)
+
+            for performanceResult in performanceResults:
+                tmpResult = {}
+                tmpResult['name'] = testRemoveReg.sub('', performanceResult['title']).upper()
+                tmpResult['class'] = testRemoveReg.sub('', performanceResult['class'])
+                tmpResult['label'] = 'Python ' + str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '.' + str(sys.version_info[2])
+                tmpResult['time'] = int(time.time())
+
+                tmpResult['report'] = {}
+                tmpResult['report'] = performanceResult
+
+                performanceResultsPost.append(tmpResult)
 
             # TODO:
             # Get path from params
@@ -220,3 +243,17 @@ class Benchmark(Plugin):
             # Save the results
             f = open(dir + object.__module__ + '.json', 'w')
             f.write(resultsToSave)
+
+
+
+            for performanceResultPost in performanceResultsPost:
+                postData = json.dumps(performanceResultPost)
+                headers = {
+                    'Content-type': 'application/json',
+                    'Content-Length': str(len(postData))
+                    }
+
+                # TODO:
+                # Need some check here
+                requests.post(postUrl, data=postData, headers=headers)
+
