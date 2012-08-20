@@ -1,4 +1,11 @@
-import sys, os, logging, math, time, urllib2
+import sys, os, logging, math, time
+
+if sys.version_info >= (3, 0):
+    from urllib.request import Request as request
+    from urllib.request import urlopen
+else:
+    from urllib2 import Request as request
+    from urllib2 import urlopen
 
 if sys.version_info < (2, 7):
     import simplejson as json
@@ -257,6 +264,6 @@ class Benchmark(Plugin):
                 # TODO:
                 # Need some check here
 
-                request = urllib2.Request(postUrl, postData, headers)
-                response = urllib2.urlopen(request)
+                req = request(postUrl, postData, headers)
+                response = urlopen(req)
 
