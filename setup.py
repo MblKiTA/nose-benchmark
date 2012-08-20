@@ -19,9 +19,6 @@ setup(
     description = 'Benchmark nose plugin',
     license = 'GNU LGPL',
     py_modules = ['benchmark'],
-    setup_requires = [
-        'requests'
-        ],
     entry_points = {
         'nose.plugins.0.10': [
             'benchmark = benchmark:Benchmark'

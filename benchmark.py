@@ -1,4 +1,4 @@
-import sys, os, logging, math, time, requests
+import sys, os, logging, math, time, urllib2
 
 if sys.version_info < (2, 7):
     import simplejson as json
@@ -17,6 +17,7 @@ def upper(matchobj):
 # TODO:
 # - Get post url from options
 postUrl = 'http://still-wildwood-9084.herokuapp.com/send/c6ebcf9ec36d21fbc8aea7d6d26a7411'
+postUrl = 'http://still-wildwood-9084.herokuapp.com/send/7f46cd17fbf5c1d9f5327bebb101088d/'
 
 
 # TODO:
@@ -255,5 +256,7 @@ class Benchmark(Plugin):
 
                 # TODO:
                 # Need some check here
-                requests.post(postUrl, data=postData, headers=headers)
+
+                request = urllib2.Request(postUrl, postData, headers)
+                response = urllib2.urlopen(request)
 
