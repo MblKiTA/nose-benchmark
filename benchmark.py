@@ -256,7 +256,7 @@ class Benchmark(Plugin):
 
             for performanceResultPost in performanceResultsPost:
                 postData = json.dumps(performanceResultPost)
-                headers = {
+                reqHeaders = {
                     'Content-type': 'application/json',
                     'Content-Length': str(len(postData))
                     }
@@ -264,6 +264,6 @@ class Benchmark(Plugin):
                 # TODO:
                 # Need some check here
 
-                req = request(postUrl, postData, headers)
+                req = request(url=postUrl, data=postData.encode('UTF-8'), headers=reqHeaders)
                 response = urlopen(req)
 
