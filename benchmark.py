@@ -24,7 +24,6 @@ def upper(matchobj):
 # TODO:
 # - Get post url from options
 postUrl = 'http://still-wildwood-9084.herokuapp.com/send/c6ebcf9ec36d21fbc8aea7d6d26a7411'
-postUrl = 'http://still-wildwood-9084.herokuapp.com/send/7f46cd17fbf5c1d9f5327bebb101088d/'
 
 
 # TODO:
