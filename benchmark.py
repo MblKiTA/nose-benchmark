@@ -176,14 +176,14 @@ def benchmark(invocations=0, repeats=0, threads=0):
 
 class Benchmark(Plugin):
     name = 'benchmark'
-    postUrl = 'http://still-wildwood-9084.herokuapp.com/send/c6ebcf9ec36d21fbc8aea7d6d26a7411'
+    postUrl = 'http://still-wildwood-9084.herokuapp.com/send/c6ebcf9ec36d21fbc8aea7d6d26a7411/'
 
     def options(self, parser, env=os.environ):
         super(Benchmark, self).options(parser, env=env)
 
         parser.add_option(
             "--postUrl",
-            default=env.get('NOSE_BENCHMARK_POST_URL') or self.postUrl,
+            default=self.postUrl,
             dest="postUrl",
             help="URL to send benchmarks results to"
         )
@@ -191,7 +191,6 @@ class Benchmark(Plugin):
 
     def configure(self, options, conf):
         super(Benchmark, self).configure(options, conf)
-
         self.postUrl = options.postUrl
 
         if not self.enabled:
