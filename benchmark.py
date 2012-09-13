@@ -22,11 +22,6 @@ def upper(matchobj):
     return matchobj.group(0).upper()
 
 # TODO:
-# - Get post url from options
-postUrl = 'http://still-wildwood-9084.herokuapp.com/send/c6ebcf9ec36d21fbc8aea7d6d26a7411'
-
-
-# TODO:
 # - Get filenames from options
 # - Check if they exist
 # - Check if they are not empty
@@ -181,12 +176,24 @@ def benchmark(invocations=0, repeats=0, threads=0):
 
 class Benchmark(Plugin):
     name = 'benchmark'
+    postUrl = 'http://still-wildwood-9084.herokuapp.com/send/c6ebcf9ec36d21fbc8aea7d6d26a7411'
 
     def options(self, parser, env=os.environ):
         super(Benchmark, self).options(parser, env=env)
 
+        parser.add_option(
+            "--postUrl",
+            default=env.get('NOSE_BENCHMARK_POST_URL') or self.postUrl,
+            dest="postUrl",
+            help="URL to send benchmarks results to"
+        )
+
+
     def configure(self, options, conf):
         super(Benchmark, self).configure(options, conf)
+
+        self.postUrl = options.postUrl
+
         if not self.enabled:
             return
 
@@ -252,7 +259,6 @@ class Benchmark(Plugin):
             f.write(resultsToSave)
 
 
-
             for performanceResultPost in performanceResultsPost:
                 postData = json.dumps(performanceResultPost)
                 reqHeaders = {
@@ -260,9 +266,10 @@ class Benchmark(Plugin):
                     'Content-Length': str(len(postData))
                     }
 
+                log.debug('Sending results to: ' + self.postUrl)
+
                 # TODO:
                 # Need some check here
-
-                req = request(url=postUrl, data=postData.encode('UTF-8'), headers=reqHeaders)
+                req = request(url=self.postUrl, data=postData.encode('UTF-8'), headers=reqHeaders)
                 response = urlopen(req)
 
